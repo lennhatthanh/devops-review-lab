@@ -21,7 +21,7 @@ jobs:
           cat > .env <<EOF
           DB_HOST=db
           DB_PORT=5432
-          DB_NAME=labdb
+          DB_NAME=labdb2
           DB_USER=postgres
           DB_PASSWORD=123456
           EOF
