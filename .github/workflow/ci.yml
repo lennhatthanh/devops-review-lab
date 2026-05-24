@@ -1,0 +1,51 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Create env file
+        run: |
+          cat > .env <<EOF
+          DB_HOST=db
+          DB_PORT=5432
+          DB_NAME=labdb
+          DB_USER=postgres
+          DB_PASSWORD=123456
+          EOF
+
+      - name: Check docker compose config
+        run: docker compose config
+
+      - name: Build services
+        run: docker compose build
+
+      - name: Start services
+        run: docker compose up -d
+
+      - name: Wait for backend
+        run: sleep 10
+
+      - name: Test health
+        run: curl --fail http://localhost:8000/health
+
+      - name: Show logs on failure
+        if: failure()
+        run: docker compose logs
+
+      - name: Cleanup
+        if: always()
+        run: docker compose down -v
+
